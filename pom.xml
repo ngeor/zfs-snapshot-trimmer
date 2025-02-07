@@ -1,62 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.github.ngeor</groupId>
-    <artifactId>java</artifactId>
-    <version>4.1.1</version>
-  </parent>
-  <groupId>net.ngeor</groupId>
+  <groupId>com.github.ngeor</groupId>
   <artifactId>zfs-snapshot-trimmer</artifactId>
   <version>1.8.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-
   <name>zfs-snapshot-trimmer</name>
+  <description>ZFS snapshot trimmer</description>
   <url>https://github.com/ngeor/zfs-snapshot-trimmer</url>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Nikolaos Georgiou</name>
+      <email>nikolaos.georgiou@gmail.com</email>
+    </developer>
+  </developers>
   <scm>
     <connection>scm:git:https://github.com/ngeor/zfs-snapshot-trimmer.git</connection>
     <developerConnection>scm:git:git@github.com:ngeor/zfs-snapshot-trimmer.git</developerConnection>
     <tag>HEAD</tag>
     <url>https://github.com/ngeor/zfs-snapshot-trimmer</url>
   </scm>
-
   <properties>
-    <maven.deploy.skip>true</maven.deploy.skip>
+    <assertj-bom.version>3.27.3</assertj-bom.version>
+    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+    <jacoco.unit-tests.limit.instruction-ratio>25%</jacoco.unit-tests.limit.instruction-ratio>
+    <java.version>21</java.version>
+    <junit.version>5.11.4</junit.version>
+    <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <palantir.version>2.39.0</palantir.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sortpom-maven-plugin.version>4.0.0</sortpom-maven-plugin.version>
+    <spotless-maven-plugin.version>2.44.2</spotless-maven-plugin.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>5.10.0</version>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-bom</artifactId>
+        <version>${assertj-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-bom</artifactId>
-        <version>3.24.2</version>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
   <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.github.ekryd.sortpom</groupId>
+          <artifactId>sortpom-maven-plugin</artifactId>
+          <version>${sortpom-maven-plugin.version}</version>
+          <configuration>
+            <createBackupFile>false</createBackupFile>
+            <expandEmptyElements>false</expandEmptyElements>
+            <keepBlankLines>false</keepBlankLines>
+            <sortProperties>true</sortProperties>
+            <sortDependencies>scope</sortDependencies>
+            <verifyFail>stop</verifyFail>
+            <verifyFailOn>strict</verifyFailOn>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless-maven-plugin.version}</version>
+          <configuration>
+            <ratchetFrom>origin/master</ratchetFrom>
+            <java>
+              <palantirJavaFormat>
+                <version>${palantir.version}</version>
+                <style>PALANTIR</style>
+              </palantirJavaFormat>
+              <removeUnusedImports/>
+            </java>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${maven-gpg-plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>${nexus-staging-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -72,15 +135,135 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <phase>test</phase>
+          </execution>
+          <execution>
+            <id>check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>INSTRUCTION</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>${jacoco.unit-tests.limit.instruction-ratio}</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
   <reporting>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
     </plugins>
   </reporting>
+  <profiles>
+    <profile>
+      <id>local</id>
+      <activation>
+        <property>
+          <name>!env.CI</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.ekryd.sortpom</groupId>
+            <artifactId>sortpom-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>sort</goal>
+                </goals>
+                <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>apply</goal>
+                </goals>
+                <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <property>
+          <name>env.GITHUB_REF_TYPE</name>
+          <value>branch</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.ekryd.sortpom</groupId>
+            <artifactId>sortpom-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+                <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+                <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
